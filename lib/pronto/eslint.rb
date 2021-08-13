@@ -3,6 +3,8 @@ require 'eslintrb'
 
 module Pronto
   class ESLint < Runner
+    DEFAULT_EXTENSIONS = %w[.js .es6 .js.es6 .jsx].freeze
+
     def run
       return [] unless @patches
 
@@ -42,7 +44,15 @@ module Pronto
     end
 
     def js_file?(path)
-      %w[.js .es6 .js.es6 .jsx].include?(File.extname(path))
+      extensions.include?(File.extname(path))
+    end
+
+    def extensions
+      @extensions ||= pronto_eslint_config.fetch('extensions', DEFAULT_EXTENSIONS)
+    end
+
+    def pronto_eslint_config
+      @pronto_eslint_config ||= Pronto::ConfigFile.new.to_h['eslint'] || {}
     end
   end
 end
